@@ -15,13 +15,13 @@
 # Build the default backend binary or image for amd64, arm, arm64 and ppc64le
 #
 # Usage:
-# 	[PREFIX=gcr.io/google_containers/defaultbackend] [ARCH=amd64] [TAG=1.1] make (server|container|push)
+# 	[PREFIX=fyery/defaultbackend] [ARCH=amd64] [TAG=1.1] make (server|container|push)
 
 
 all: push
 
-TAG=1.3
-PREFIX?=gcr.io/google_containers/defaultbackend
+TAG=1.0.0
+PREFIX?=fyery/defaultbackend
 ARCH?=amd64
 GOLANG_VERSION=1.7
 TEMP_DIR:=$(shell mktemp -d)
