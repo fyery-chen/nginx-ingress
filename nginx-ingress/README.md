@@ -37,7 +37,7 @@ Anytime we reference a tls secret, we mean (x509, pem encoded, RSA 2048, etc). Y
 
 
 ## Requirements
-- Default backend [404-server](https://github.com/kubernetes/contrib/tree/master/404-server)
+- Default backend [404-server](https://github.com/fyery-chen/nginx-ingress-controller/tree/master/default-backend)
 
 
 ## Command line arguments
@@ -98,37 +98,9 @@ $ kubectl create -f examples/default/rc-default.yaml
 
 ## HTTP
 
-First we need to deploy some application to publish. To keep this simple we will use the [echoheaders app](https://github.com/kubernetes/contrib/blob/master/ingress/echoheaders/echo-app.yaml) that just returns information about the http request as output
+Before the deploy of the Ingress controller we need a default backend [404-server](https://github.com/fyery-chen/nginx-ingress-controller/tree/master/default-backend)
 ```
-kubectl run echoheaders --image=gcr.io/google_containers/echoserver:1.8 --replicas=1 --port=8080
-```
-
-Now we expose the same application in two different services (so we can create different Ingress rules)
-```
-kubectl expose deployment echoheaders --port=80 --target-port=8080 --name=echoheaders-x
-kubectl expose deployment echoheaders --port=80 --target-port=8080 --name=echoheaders-y
-```
-
-Next we create a couple of Ingress rules
-```
-kubectl create -f examples/ingress.yaml
-```
-
-we check that ingress rules are defined:
-```
-$ kubectl get ing
-NAME      RULE          BACKEND   ADDRESS
-echomap   -
-          foo.bar.com
-          /foo          echoheaders-x:80
-          bar.baz.com
-          /bar          echoheaders-y:80
-          /foo          echoheaders-x:80
-```
-
-Before the deploy of the Ingress controller we need a default backend [404-server](https://github.com/kubernetes/contrib/tree/master/404-server)
-```
-kubectl create -f examples/default-backend.yaml
+kubectl create -f default-backend.yaml
 kubectl expose rc default-http-backend --port=80 --target-port=8080 --name=default-http-backend
 ```
 
@@ -169,9 +141,6 @@ spec:
     serviceName: s1
     servicePort: 80
 ```
-Please follow [test.sh](https://github.com/bprashanth/Ingress/blob/master/examples/sni/nginx/test.sh) as a guide on how to generate secrets containing SSL certificates. The name of the secret can be different than the name of the certificate.
-
-Check the [example](examples/tls/README.md)
 
 ### Default SSL Certificate
 
@@ -292,24 +261,6 @@ By default the controller redirects (301) to HTTPS if there is a TLS Ingress rul
 
 To disable this behavior use `hsts=false` in the NGINX config map.
 
-
-### Automated Certificate Management with Kube-Lego
-
-[Kube-Lego] automatically requests missing or expired certificates from
-[Let's Encrypt] by monitoring ingress resources and their referenced secrets. To
-enable this for an ingress resource you have to add an annotation:
-
-```
-kubectl annotate ing ingress-demo kubernetes.io/tls-acme="true"
-```
-
-To setup Kube-Lego you can take a look at this [full example]. The first
-version to fully support Kube-Lego is nginx Ingress controller 0.8.
-
-[full example]:https://github.com/jetstack/kube-lego/tree/master/examples
-[Kube-Lego]:https://github.com/jetstack/kube-lego
-[Let's Encrypt]:https://letsencrypt.org
-
 ## Exposing TCP services
 
 Ingress does not support TCP services (yet). For this reason this Ingress controller uses the flag `--tcp-services-configmap` to point to an existing config map where the key is the external port to use and the value is `<namespace/service name>:<service port>:[PROXY]`
@@ -324,9 +275,6 @@ metadata:
 data:
   9000: "default/example-go:8080"
 ```
-
-
-Please check the [tcp services](../../examples/tcp/nginx/README.md) example
 
 ## Exposing UDP services
 
@@ -345,17 +293,11 @@ data:
   53: "kube-system/kube-dns:53"
 ```
 
-
-Please check the [udp services](../../examples/udp/nginx/README.md) example
-
 ## Proxy Protocol
 
 If you are using a L4 proxy to forward the traffic to the NGINX pods and terminate HTTP/HTTPS there, you will lose the remote endpoint's IP addresses. To prevent this you could use the [Proxy Protocol](http://www.haproxy.org/download/1.5/doc/proxy-protocol.txt) for forwarding traffic, this will send the connection details before forwarding the actual TCP connection itself.
 
 Amongst others [ELBs in AWS](http://docs.aws.amazon.com/ElasticLoadBalancing/latest/DeveloperGuide/enable-proxy-protocol.html) and [HAProxy](http://www.haproxy.org/) support Proxy Protocol.
-
-Please check the [proxy-protocol](examples/proxy-protocol/) example
-
 
 ### Custom errors
 
@@ -363,7 +305,7 @@ In case of an error in a request the body of the response is obtained from the `
 - `X-Code` indicates the HTTP code
 - `X-Format` the value of the `Accept` header
 
-Using this two headers is possible to use a custom backend service like [this one](https://github.com/aledbf/contrib/tree/nginx-debug-server/Ingress/images/nginx-error-server) that inspect each request and returns a custom error page with the format expected by the client. Please check the example [custom-errors](examples/custom-errors/README.md)
+Using this two headers is possible to use a custom backend service like [this one](https://github.com/aledbf/contrib/tree/nginx-debug-server/Ingress/images/nginx-error-server) that inspect each request and returns a custom error page with the format expected by the client.
 
 ### NGINX status page
 
