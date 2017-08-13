@@ -15,19 +15,19 @@ How to build and push all images:
 # Build for linux/amd64 (default)
 $ make push
 $ make push ARCH=amd64
-# ---> gcr.io/google_containers/defaultbackend-amd64:TAG
+# ---> fyery/defaultbackend-amd64:TAG
 
 $ make push-legacy ARCH=amd64
-# ---> gcr.io/google_containers/defaultbackend:TAG (image with backwards compatible naming)
+# ---> fyery/defaultbackend:TAG (image with backwards compatible naming)
 
 $ make push ARCH=arm
-# ---> gcr.io/google_containers/defaultbackend-arm:TAG
+# ---> fyery/defaultbackend-arm:TAG
 
 $ make push ARCH=arm64
-# ---> gcr.io/google_containers/defaultbackend-arm64:TAG
+# ---> fyery/defaultbackend-arm64:TAG
 
 $ make push ARCH=ppc64le
-# ---> gcr.io/google_containers/defaultbackend-ppc64le:TAG
+# ---> fyery/defaultbackend-ppc64le:TAG
 ```
 
 Of course, if you don't want to push the images, just run `make container`
